@@ -1,0 +1,6 @@
+http://ctscmongo01lp.jax.org:8080 {
+    encode
+    root {$FILE_DIR}
+
+    file_server
+}

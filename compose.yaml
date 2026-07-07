@@ -1,0 +1,14 @@
+volumes:
+  caddy-data:
+  caddy-config:
+services:
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      FILE_DIR: /srv
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      [./caddy:/etc/caddy, caddy-data:/data, caddy-config:/config, ./app:/srv]
+    pull_policy: always
