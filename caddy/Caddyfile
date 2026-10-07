@@ -1,5 +1,6 @@
-http://ctscmongo01lp.jax.org:8080 {
+{$SITE_ADDRESS} {
     encode
+    {$TLS_SETTINGS}
     root {$FILE_DIR}
 
     file_server

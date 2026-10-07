@@ -2905,6 +2905,16 @@
                         "success",
                     );
                 } catch (err) {
+                    // Async Clipboard API unavailable/blocked (plain HTTP, iframe,
+                    // focus, permissions): select the rendered preview and use the
+                    // legacy copy command, which keeps rich formatting.
+                    if (copyPreviewLegacy()) {
+                        showToast(
+                            "✓ Email body copied! Paste into Outlook compose window.",
+                            "success",
+                        );
+                        return;
+                    }
                     try {
                         await navigator.clipboard.writeText(html);
                         showToast(
@@ -2920,12 +2930,50 @@
                 }
             }
 
-            async function copySubject() {
+            function copyPreviewLegacy() {
+                const el = document.getElementById("previewFrame");
+                const sel = window.getSelection();
+                const saved = sel.rangeCount ? sel.getRangeAt(0) : null;
                 try {
-                    await navigator.clipboard.writeText(buildSubject());
+                    const range = document.createRange();
+                    range.selectNodeContents(el);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    return document.execCommand("copy");
+                } catch (e) {
+                    return false;
+                } finally {
+                    sel.removeAllRanges();
+                    if (saved) sel.addRange(saved);
+                }
+            }
+
+            function copyTextLegacy(text) {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    return document.execCommand("copy");
+                } catch (e) {
+                    return false;
+                } finally {
+                    ta.remove();
+                }
+            }
+
+            async function copySubject() {
+                const subject = buildSubject();
+                try {
+                    await navigator.clipboard.writeText(subject);
                     showToast("✓ Subject line copied!", "success");
                 } catch (e) {
-                    showToast("Copy failed", "error");
+                    if (copyTextLegacy(subject)) {
+                        showToast("✓ Subject line copied!", "success");
+                    } else {
+                        showToast("Copy failed", "error");
+                    }
                 }
             }
 

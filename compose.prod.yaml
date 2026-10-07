@@ -1,0 +1,15 @@
+# Production overrides: HTTPS using the host's existing TLS certificate.
+# Needed because the async Clipboard API only exists in secure contexts.
+services:
+  caddy:
+    environment:
+      TLS_SETTINGS: tls /run/secrets/tls_certificate /run/secrets/tls_key
+    secrets:
+      - tls_certificate
+      - tls_key
+
+secrets:
+  tls_certificate:
+    file: ${TLS_CERTIFICATE_PATH}
+  tls_key:
+    file: ${TLS_KEY_PATH}

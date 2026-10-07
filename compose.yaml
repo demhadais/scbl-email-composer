@@ -6,9 +6,11 @@ services:
     image: caddy:2-alpine
     environment:
       FILE_DIR: /srv
+      SITE_ADDRESS: ${SITE_ADDRESS:-http://:8080}
+      TLS_SETTINGS: ""
     restart: always
     ports:
-      - "8080:8080"
+      - "${PORT:-8080}:${PORT:-8080}"
     volumes:
       [./caddy:/etc/caddy, caddy-data:/data, caddy-config:/config, ./app:/srv]
     pull_policy: always
